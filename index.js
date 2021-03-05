@@ -42,7 +42,7 @@ async function main(){
         let introduction=req.body.introduction
 
         try{
-            let result=db.collection('profiles').insertOne({
+            let result= await db.collection('profiles').insertOne({
                 account_id:account_id,
                 name:name,
                 age:age,
@@ -103,6 +103,16 @@ async function main(){
             })
             console.log(e)
         }
+    })
+
+    app.delete('/profiles/:id', async (req,res)=>{
+        await db.collection('profiles').deleteOne({
+            _id:ObjectId(req.params.id)
+        })
+        res.status(200)
+        res.send({
+            'message':'deleted'
+        })
     })
 
 
