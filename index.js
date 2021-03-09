@@ -32,24 +32,20 @@ async function main(){
     })
 
     app.post('/profiles', async (req,res)=>{
-        let account_id=req.body.account_id
         let name=req.body.name;
-        let age=req.body.age;
+        // let username=req.body.username
         let gender=req.body.gender;
+        let age=req.body.age;
         let interests=req.body.interests;
-        let contact=req.body.contact;
-        let likes=req.body.likes;
         let introduction=req.body.introduction
 
         try{
             let result= await db.collection('profiles').insertOne({
-                account_id:account_id,
                 name:name,
-                age:age,
+                // username:username,
                 gender:gender,
+                age:age,
                 interests:interests,
-                contact:contact,
-                likes:likes,
                 introduction:introduction
             })
             res.status(200)
@@ -63,15 +59,43 @@ async function main(){
         }
     })
 
+    app.post('/usernames', async (req,res)=>{
+        let username=req.body.username
+        let foundUser=await db.collection('usernames').findOne({username:username})
+        if (foundUser!=null){
+            res.status(500)
+            res.send({
+                error:'Username has been taken'
+            })
+
+        }else{
+            try{
+            let result= await db.collection('usernames').insertOne({
+                username:username,
+            })
+            res.status(200)
+            res.send(result)
+        }catch(e){
+            res.status(500)
+            res.send({
+                error:'Internal server error'
+            })
+            console.log(e)
+        }
+
+        }
+        
+    })
+
     app.post('/conversations', async (req,res)=>{
-        let conversation_id=req.body.conversation_id
-        let users_ids=req.body.users_id;
+        let users_ids=req.body._id;
+        let messages=req.body.message
         
 
         try{
             let result=db.collection('conversations').insertOne({
-                conversation_id:conversation_id,
-                users_id:users_ids
+                users_id:users_ids,
+            
             })
             res.status(200)
             res.send(result)
@@ -114,6 +138,8 @@ async function main(){
             'message':'deleted'
         })
     })
+
+    // app.put('/profiles')
 
 
 }
