@@ -33,16 +33,14 @@ async function main(){
 
     app.post('/profiles', async (req,res)=>{
         let name=req.body.name;
-        // let username=req.body.username
         let gender=req.body.gender;
         let age=req.body.age;
         let interests=req.body.interests;
-        let introduction=req.body.introduction
+        let introduction=req.body.introduction;
 
         try{
             let result= await db.collection('profiles').insertOne({
                 name:name,
-                // username:username,
                 gender:gender,
                 age:age,
                 interests:interests,
@@ -72,6 +70,7 @@ async function main(){
             try{
             let result= await db.collection('usernames').insertOne({
                 username:username,
+                user_id:ObjectId(req.body.user_id)
             })
             res.status(200)
             res.send(result)
