@@ -19,12 +19,6 @@ async function main() {
         res.send(results)
     })
 
-    // app.get('/conversations',async (req,res)=>{
-    //     let results=await db.collection('connections').find({}).toArray()
-    //     res.status(200)
-    //     res.send(results)
-    // })
-
     app.post('/searchbygender', async (req, res) => {
         let results = await db.collection('profiles').find({
             $or: [
@@ -112,47 +106,47 @@ async function main() {
 
     })
 
+    app.post('/searchUsernames',async (req,res)=>{
+        let username = req.body.username
+        let foundUser = await db.collection('usernames').findOne({ username: username })
+        if (foundUser != null) {
+            res.status(200)
+            res.send('yes')
+        }else{
+            res.send('no')
+        }
+    })
+
     app.post('/conversations', async (req, res) => {
-        let users_ids = req.body._id;
-        let messages = req.body.message
-
-
-        try {
-            let result = db.collection('conversations').insertOne({
-                users_id: users_ids,
-
-            })
-            res.status(200)
-            res.send(result)
-        } catch (e) {
-            res.status(500)
-            res.send({
-                error: 'Internal server error'
-            })
-            console.log(e)
-        }
+        let username=req.body.username
+        let foundUser=await db.collection('profiles').findOne({username:username})
+        let result=await db.collection('conversations').insertOne({
+            users_id:foundUser
+        })
+        res.status(200)
+        res.send(foundUser)
     })
 
-    app.post('/matches', async (req, res) => {
-        let matched_id = req.body.matched_id
-        let users_ids = req.body.users_id;
+    // app.post('/matches', async (req, res) => {
+    //     let matched_id = req.body.matched_id
+    //     let users_ids = req.body.users_id;
 
 
-        try {
-            let result = db.collection('matches').insertOne({
-                matched_id: matched_id,
-                users_id: users_ids
-            })
-            res.status(200)
-            res.send(result)
-        } catch (e) {
-            res.status(500)
-            res.send({
-                error: 'Internal server error'
-            })
-            console.log(e)
-        }
-    })
+    //     try {
+    //         let result = db.collection('matches').insertOne({
+    //             matched_id: matched_id,
+    //             users_id: users_ids
+    //         })
+    //         res.status(200)
+    //         res.send(result)
+    //     } catch (e) {
+    //         res.status(500)
+    //         res.send({
+    //             error: 'Internal server error'
+    //         })
+    //         console.log(e)
+    //     }
+    // })
 
     app.delete('/profiles/:id', async (req, res) => {
         await db.collection('profiles').deleteOne({
