@@ -111,42 +111,23 @@ async function main() {
         let foundUser = await db.collection('usernames').findOne({ username: username })
         if (foundUser != null) {
             res.status(200)
-            res.send('yes')
+            res.send(foundUser.user_id)
         }else{
             res.send('no')
         }
     })
 
     app.post('/conversations', async (req, res) => {
-        let username=req.body.username
-        let foundUser=await db.collection('profiles').findOne({username:username})
+        let user_id=req.body.user_id
+        let user2_id=req.body.user2_id
         let result=await db.collection('conversations').insertOne({
-            users_id:foundUser
+            user_id:user_id,
+            user2_id:user2_id
         })
         res.status(200)
-        res.send(foundUser)
+        res.send(result)
     })
 
-    // app.post('/matches', async (req, res) => {
-    //     let matched_id = req.body.matched_id
-    //     let users_ids = req.body.users_id;
-
-
-    //     try {
-    //         let result = db.collection('matches').insertOne({
-    //             matched_id: matched_id,
-    //             users_id: users_ids
-    //         })
-    //         res.status(200)
-    //         res.send(result)
-    //     } catch (e) {
-    //         res.status(500)
-    //         res.send({
-    //             error: 'Internal server error'
-    //         })
-    //         console.log(e)
-    //     }
-    // })
 
     app.delete('/profiles/:id', async (req, res) => {
         await db.collection('profiles').deleteOne({
