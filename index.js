@@ -38,19 +38,20 @@ async function main() {
     app.post('/searchbyage', async (req, res) => {
         let results = await db.collection('profiles').find({
             age:{
-                '$gt':req.body.age
+                '$gte':parseInt(req.body.age),
+                '$lte':30
             }
         }).toArray()
         res.status(200)
+        console.log(results)
         res.send(results)
     })
 
     app.post('/searchbyinterests', async (req, res) => {
         let results = await db.collection('profiles').find({
-
-            interests: req.body.interests
-
-
+            interests:{
+                '$in':req.body.interests
+            } 
         }).toArray()
         res.status(200)
         res.send(results)
