@@ -142,6 +142,7 @@ async function main() {
                     introduction: req.body.introduction
                 }
             })
+
             res.status(200)
             res.send('updated')
         } catch (e) {
@@ -154,26 +155,26 @@ async function main() {
         }
     })
 
-    app.put('/editUsername', async (req, res) => {
-        try {
-            await db.collection('usernames').updateOne({
-                user_id: ObjectId(req.body.user_id)
-            }, {
-                $set: {
-                    username: req.body.username
-                }
-            })
-            res.status(200)
-            res.send('updated')
-        } catch (e) {
-            res.status(500)
-            res.send({
-                'message': 'Unable to update username'
-            })
-            console.log(e)
+    // app.put('/editUsername', async (req, res) => {
+    //     try {
+    //         await db.collection('usernames').updateOne({
+    //             user_id: ObjectId(req.body.user_id)
+    //         }, {
+    //             $set: {
+    //                 username: req.body.username
+    //             }
+    //         })
+    //         res.status(200)
+    //         res.send('updated')
+    //     } catch (e) {
+    //         res.status(500)
+    //         res.send({
+    //             'message': 'Unable to update username'
+    //         })
+    //         console.log(e)
 
-        }
-    })
+    //     }
+    // })
 
     app.post('/conversations', async (req, res) => {
         let user_id = req.body.user_id
@@ -187,9 +188,9 @@ async function main() {
     })
 
 
-    app.delete('/profiles/:id', async (req, res) => {
+    app.delete('/deleteProfile', async (req, res) => {
         await db.collection('profiles').deleteOne({
-            _id: ObjectId(req.params.id)
+            _id: ObjectId(req.body.user_id)
         })
         res.status(200)
         res.send({
@@ -197,7 +198,15 @@ async function main() {
         })
     })
 
-    // app.put('/profiles')
+    app.delete('/deleteUsername', async (req, res) => {
+        await db.collection('usernames').deleteOne({
+            user_id: ObjectId(req.body.user_id)
+        })
+        res.status(200)
+        res.send({
+            'message': 'deleted'
+        })
+    })
 
 
 }
