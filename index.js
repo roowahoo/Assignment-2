@@ -142,6 +142,20 @@ async function main() {
                     introduction: req.body.introduction
                 }
             })
+            res.status(200)
+            res.send('updated')
+        } catch (e) {
+            res.status(500)
+            res.send({
+                'message': 'Unable to update profile'
+            })
+            console.log(e)
+
+        }
+    })
+
+    app.put('/editUsername', async (req, res) => {
+        try {
             await db.collection('usernames').updateOne({
                 user_id: ObjectId(req.body.user_id)
             }, {
@@ -154,7 +168,7 @@ async function main() {
         } catch (e) {
             res.status(500)
             res.send({
-                'message': 'Unable to update'
+                'message': 'Unable to update username'
             })
             console.log(e)
 
