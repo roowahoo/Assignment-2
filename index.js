@@ -31,9 +31,9 @@ async function main() {
 
     app.post('/searchbyage', async (req, res) => {
         let results = await db.collection('profiles').find({
-            age:{
-                '$gte':parseInt(req.body.age),
-                '$lte':30
+            age: {
+                '$gte': parseInt(req.body.age),
+                '$lte': 30
             }
         }).toArray()
         res.status(200)
@@ -43,9 +43,9 @@ async function main() {
 
     app.post('/searchbyinterests', async (req, res) => {
         let results = await db.collection('profiles').find({
-            interests:{
-                '$in':req.body.interests
-            } 
+            interests: {
+                '$in': req.body.interests
+            }
         }).toArray()
         res.status(200)
         res.send(results)
@@ -54,7 +54,7 @@ async function main() {
     app.post('/profiles', async (req, res) => {
         let name = req.body.name;
         let gender = req.body.gender;
-        let dob=req.body.dob;
+        let dob = req.body.dob;
         let age = req.body.age;
         let interests = req.body.interests;
         let introduction = req.body.introduction;
@@ -63,7 +63,7 @@ async function main() {
             let result = await db.collection('profiles').insertOne({
                 name: name,
                 gender: gender,
-                dob:dob,
+                dob: dob,
                 age: age,
                 interests: interests,
                 introduction: introduction
@@ -108,8 +108,8 @@ async function main() {
 
     })
 
-    app.post('/findProfile',async (req,res)=>{
-        let user_id=ObjectId(req.body.user_id)
+    app.post('/findProfile', async (req, res) => {
+        let user_id = ObjectId(req.body.user_id)
         console.log(user_id)
         let foundUser = await db.collection('profiles').findOne({ _id: user_id })
         console.log(foundUser)
@@ -117,23 +117,56 @@ async function main() {
         res.send(foundUser)
     })
 
-    app.post('/searchUsernames',async (req,res)=>{
+    app.post('/searchUsernames', async (req, res) => {
         let username = req.body.username
         let foundUser = await db.collection('usernames').findOne({ username: username })
         if (foundUser != null) {
             res.status(200)
             res.send(foundUser.user_id)
-        }else{
-            res.send('no')
+        } else {
+            res.send('no username found')
+        }
+    })
+
+    app.put('/editProfile', async (req, res) => {
+        try {
+            await db.collection('profiles').updateOne({
+                _id: ObjectId(req.body.user_id)
+            }, {
+                $set: {
+                    name: req.body.name,
+                    gender: req.body.gender,
+                    dob: req.body.dob,
+                    age: req.body.age,
+                    interests: req.body.interests,
+                    introduction: req.body.introduction
+                }
+            })
+            await db.collection('usernames').updateOne({
+                user_id: ObjectId(req.body.user_id)
+            }, {
+                $set: {
+                    username: req.body.username
+                }
+            })
+            res.status(200)
+            res.send('updated')
+        } catch (e) {
+            res.status(500)
+            res.send({
+                'message': 'Unable to update'
+            })
+            console.log(e)
+
         }
     })
 
     app.post('/conversations', async (req, res) => {
-        let user_id=req.body.user_id
-        let user2_id=req.body.user2_id
-        let result=await db.collection('conversations').insertOne({
-            user_id:user_id,
-            user2_id:user2_id
+        let user_id = req.body.user_id
+        let user2_id = req.body.user2_id
+        let result = await db.collection('conversations').insertOne({
+            user_id: user_id,
+            user2_id: user2_id
         })
         res.status(200)
         res.send(result)
