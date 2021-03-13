@@ -54,6 +54,7 @@ async function main() {
     app.post('/profiles', async (req, res) => {
         let name = req.body.name;
         let gender = req.body.gender;
+        let dob=req.body.dob;
         let age = req.body.age;
         let interests = req.body.interests;
         let introduction = req.body.introduction;
@@ -62,6 +63,7 @@ async function main() {
             let result = await db.collection('profiles').insertOne({
                 name: name,
                 gender: gender,
+                dob:dob,
                 age: age,
                 interests: interests,
                 introduction: introduction
@@ -104,6 +106,15 @@ async function main() {
 
         }
 
+    })
+
+    app.post('/findProfile',async (req,res)=>{
+        let user_id=ObjectId(req.body.user_id)
+        console.log(user_id)
+        let foundUser = await db.collection('profiles').findOne({ _id: user_id })
+        console.log(foundUser)
+        res.status(200)
+        res.send(foundUser)
     })
 
     app.post('/searchUsernames',async (req,res)=>{
