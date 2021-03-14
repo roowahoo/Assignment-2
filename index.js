@@ -181,21 +181,65 @@ async function main() {
         let user2_id = req.body.user2_id
         let result = await db.collection('conversations').insertOne({
             user_id: user_id,
-            user2_id: user2_id
+            user2_id: user2_id,
+            messages: []
         })
         res.status(200)
         res.send(result)
     })
 
-
-    app.delete('/deleteProfile', async (req, res) => {
-        await db.collection('profiles').deleteOne({
-            _id: ObjectId(req.body.user_id)
-        })
+    app.post('/findConversations', async (req, res) => {
+        let user_id = req.body.user_id
+        let foundConversation = await db.collection('conversations').find({
+            $or: [
+                { user_id: user_id },
+                { user2_id: user_id }
+            ]
+        }).toArray()
         res.status(200)
-        res.send({
-            'message': 'deleted'
-        })
+        res.send(foundConversation)
+    })
+
+
+
+    app.put('/conversations', async (req, res) => {
+        try {
+            await db.collection('conversations').updateOne({
+                _id: ObjectId(req.body.conversationId)
+            }, {
+                $push: {
+                    messages: req.body.message
+                }
+            })
+            res.status(200)
+            res.send('Message sent')
+        } catch (e) {
+            res.status(500)
+            res.send({
+                'error': 'Unable to send message'
+            })
+
+        }
+    })
+
+
+    app.delete('/deleteProfile/:user_id', async (req, res) => {
+        try {
+            await db.collection('profiles').deleteOne({
+                _id: ObjectId(req.params.user_id)
+            })
+            res.status(200)
+            res.send({
+                'message': 'deleted'
+            })
+
+        } catch (e) {
+            res.status(500)
+            res.send({
+                'message': 'Unable to delete'
+            })
+        }
+
     })
 
     app.delete('/deleteUsername', async (req, res) => {
