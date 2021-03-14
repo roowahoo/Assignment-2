@@ -33,7 +33,7 @@ async function main() {
         let results = await db.collection('profiles').find({
             age: {
                 '$gte': parseInt(req.body.age),
-                '$lte': 30
+                '$lte': parseInt(req.body.age)+10
             }
         }).toArray()
         res.status(200)
