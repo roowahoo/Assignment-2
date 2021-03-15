@@ -242,9 +242,9 @@ async function main() {
 
     })
 
-    app.delete('/deleteUsername', async (req, res) => {
+    app.delete('/deleteUsername/:user_id', async (req, res) => {
         await db.collection('usernames').deleteOne({
-            user_id: ObjectId(req.body.user_id)
+            user_id: ObjectId(req.params.user_id)
         })
         res.status(200)
         res.send({
