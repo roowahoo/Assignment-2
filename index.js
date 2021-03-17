@@ -240,12 +240,13 @@ async function main() {
         let user_name = req.body.user_name
         let user2_id = req.body.user2_id
         let user2_name = req.body.user2_name
+        let message=req.body.message
         let result = await db.collection('conversations').insertOne({
             user_id: user_id,
             user_name: user_name,
             user2_id: user2_id,
             user2_name: user2_name,
-            messages: []
+            messages: [message]
         })
         res.status(200)
         res.send(result)
