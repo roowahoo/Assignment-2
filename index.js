@@ -21,9 +21,9 @@ async function main() {
 
     app.post('/searchbygender', async (req, res) => {
         let results = await db.collection('profiles').find({
-            $or: [
-                { gender: req.body.gender }
-            ]
+
+            gender: req.body.gender
+
         }).toArray()
         res.status(200)
         res.send(results)
@@ -33,7 +33,7 @@ async function main() {
         let results = await db.collection('profiles').find({
             age: {
                 '$gte': parseInt(req.body.age),
-                '$lte': parseInt(req.body.age)+10
+                '$lt': parseInt(req.body.age) + 10
             }
         }).toArray()
         res.status(200)
@@ -51,6 +51,62 @@ async function main() {
         res.send(results)
     })
 
+    app.post('/searchbyall', async (req, res) => {
+        let results = await db.collection('profiles').find({
+            age: {
+                '$gte': parseInt(req.body.age),
+                '$lte': parseInt(req.body.age) + 10
+            },
+            interests: {
+                '$in': req.body.interests
+            },
+            gender: req.body.gender
+        }).toArray()
+        res.status(200)
+        console.log(results)
+        res.send(results)
+    })
+
+    app.post('/searchbygenderage', async (req, res) => {
+        let results = await db.collection('profiles').find({
+
+            gender: req.body.gender,
+            age: {
+                '$gte': parseInt(req.body.age),
+                '$lt': parseInt(req.body.age) + 10
+            }
+        }).toArray()
+        res.status(200)
+        res.send(results)
+    })
+
+    app.post('/searchbygenderinterests', async (req, res) => {
+        let results = await db.collection('profiles').find({
+
+            gender: req.body.gender,
+            interests: {
+                '$in': req.body.interests
+            }
+        }).toArray()
+        res.status(200)
+        res.send(results)
+    })
+
+    app.post('/searchbyageinterests', async (req, res) => {
+        let results = await db.collection('profiles').find({
+
+            age: {
+                '$gte': parseInt(req.body.age),
+                '$lt': parseInt(req.body.age) + 10
+            },
+            interests: {
+                '$in': req.body.interests
+            }
+        }).toArray()
+        res.status(200)
+        res.send(results)
+    })
+
     app.post('/profiles', async (req, res) => {
         let name = req.body.name;
         let gender = req.body.gender;
@@ -58,6 +114,7 @@ async function main() {
         let age = req.body.age;
         let interests = req.body.interests;
         let introduction = req.body.introduction;
+        let image = req.body.image_url
 
         try {
             let result = await db.collection('profiles').insertOne({
@@ -66,7 +123,8 @@ async function main() {
                 dob: dob,
                 age: age,
                 interests: interests,
-                introduction: introduction
+                introduction: introduction,
+                image: image
             })
             res.status(200)
             res.send(result)
@@ -92,7 +150,8 @@ async function main() {
             try {
                 let result = await db.collection('usernames').insertOne({
                     username: username,
-                    user_id: ObjectId(req.body.user_id)
+                    user_id: ObjectId(req.body.user_id),
+                    name: req.body.name
                 })
                 res.status(200)
                 res.send(result)
@@ -122,7 +181,7 @@ async function main() {
         let foundUser = await db.collection('usernames').findOne({ username: username })
         if (foundUser != null) {
             res.status(200)
-            res.send(foundUser.user_id)
+            res.send(foundUser)
         } else {
             res.send('no username found')
         }
@@ -178,10 +237,14 @@ async function main() {
 
     app.post('/conversations', async (req, res) => {
         let user_id = req.body.user_id
+        let user_name = req.body.user_name
         let user2_id = req.body.user2_id
+        let user2_name = req.body.user2_name
         let result = await db.collection('conversations').insertOne({
             user_id: user_id,
+            user_name: user_name,
             user2_id: user2_id,
+            user2_name: user2_name,
             messages: []
         })
         res.status(200)
@@ -251,8 +314,6 @@ async function main() {
             'message': 'deleted'
         })
     })
-
-
 }
 main()
 
