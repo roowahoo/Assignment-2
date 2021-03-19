@@ -14,7 +14,14 @@ async function main() {
     let db = await MongoUtil.connect(mongoUrl, 'dating_app')
 
     app.get('/profiles', async (req, res) => {
-        let results = await db.collection('profiles').find({}).toArray()
+        let results = await db.collection('profiles').find({}).project({
+            name:1,
+            age:1,
+            gender:1,
+            interests:1,
+            introduction:1,
+            image:1
+        }).toArray()
         res.status(200)
         res.send(results)
     })
@@ -241,19 +248,24 @@ async function main() {
         let user2_id = req.body.user2_id
         let user2_name = req.body.user2_name
         let message=req.body.message
+        let name=req.body.name
         let result = await db.collection('conversations').insertOne({
-            user_id: user_id,
+            user_id: ObjectId(user_id),
             user_name: user_name,
-            user2_id: user2_id,
+            user2_id: ObjectId(user2_id),
             user2_name: user2_name,
-            messages: [message]
+            messages: [{
+                _id:ObjectId(),
+                name:name,
+                message:message
+            }]
         })
         res.status(200)
         res.send(result)
     })
 
     app.post('/findConversations', async (req, res) => {
-        let user_id = req.body.user_id
+        let user_id = ObjectId(req.body.user_id)
         let foundConversation = await db.collection('conversations').find({
             $or: [
                 { user_id: user_id },
@@ -264,15 +276,18 @@ async function main() {
         res.send(foundConversation)
     })
 
-
-
     app.put('/conversations', async (req, res) => {
         try {
             await db.collection('conversations').updateOne({
                 _id: ObjectId(req.body.conversationId)
             }, {
                 $push: {
-                    messages: req.body.message
+                    messages: {
+                        _id:ObjectId(),
+                        name:req.body.name,
+                        message:req.body.message
+                        
+                    }
                 }
             })
             res.status(200)
