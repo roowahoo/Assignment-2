@@ -301,6 +301,29 @@ async function main() {
         }
     })
 
+    app.post('/conversations/editmessage', async (req, res) => {
+        try {
+            await db.collection('conversations').updateOne({
+                // _id:ObjectId(req.body.conversationId),
+                'messages._id':ObjectId(req.body.messageId)
+            }, {
+                $set: {
+                    
+                        'messages.$.message':req.body.message
+                        
+                }
+            })
+            res.status(200)
+            res.send('Message sent')
+        } catch (e) {
+            res.status(500)
+            res.send({
+                'error': 'Unable to send message'
+            })
+
+        }
+    })
+
 
     app.delete('/deleteProfile/:user_id', async (req, res) => {
         try {
