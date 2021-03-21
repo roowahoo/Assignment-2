@@ -119,6 +119,7 @@ async function main() {
         let gender = req.body.gender;
         let dob = req.body.dob;
         let age = req.body.age;
+        let country = req.body.country;
         let interests = req.body.interests;
         let introduction = req.body.introduction;
         let image = req.body.image_url
@@ -129,6 +130,7 @@ async function main() {
                 gender: gender,
                 dob: dob,
                 age: age,
+                country:country,
                 interests: interests,
                 introduction: introduction,
                 image: image
@@ -204,6 +206,7 @@ async function main() {
                     gender: req.body.gender,
                     dob: req.body.dob,
                     age: req.body.age,
+                    country:req.body.country,
                     interests: req.body.interests,
                     introduction: req.body.introduction
                 }
@@ -343,6 +346,8 @@ async function main() {
         }
 
     })
+
+   
 
     app.delete('/deleteUsername/:user_id', async (req, res) => {
         await db.collection('usernames').deleteOne({
