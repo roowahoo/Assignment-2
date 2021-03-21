@@ -15,12 +15,12 @@ async function main() {
 
     app.get('/profiles', async (req, res) => {
         let results = await db.collection('profiles').find({}).project({
-            name:1,
-            age:1,
-            gender:1,
-            interests:1,
-            introduction:1,
-            image:1
+            name: 1,
+            age: 1,
+            gender: 1,
+            interests: 1,
+            introduction: 1,
+            image: 1
         }).toArray()
         res.status(200)
         res.send(results)
@@ -48,6 +48,16 @@ async function main() {
         res.send(results)
     })
 
+    app.post('/searchbycountry', async (req, res) => {
+        let results = await db.collection('profiles').find({
+
+            country: req.body.country
+
+        }).toArray()
+        res.status(200)
+        res.send(results)
+    })
+
     app.post('/searchbyinterests', async (req, res) => {
         let results = await db.collection('profiles').find({
             interests: {
@@ -67,7 +77,8 @@ async function main() {
             interests: {
                 '$in': req.body.interests
             },
-            gender: req.body.gender
+            gender: req.body.gender,
+            country: req.body.country
         }).toArray()
         res.status(200)
         console.log(results)
@@ -76,12 +87,18 @@ async function main() {
 
     app.post('/searchbygenderage', async (req, res) => {
         let results = await db.collection('profiles').find({
+            $and: [
+                { gender: req.body.gender },
+                {
+                    age: {
+                        '$gte': parseInt(req.body.age),
+                        '$lt': parseInt(req.body.age) + 10
+                    }
+                }
 
-            gender: req.body.gender,
-            age: {
-                '$gte': parseInt(req.body.age),
-                '$lt': parseInt(req.body.age) + 10
-            }
+            ]
+
+
         }).toArray()
         res.status(200)
         res.send(results)
@@ -130,7 +147,7 @@ async function main() {
                 gender: gender,
                 dob: dob,
                 age: age,
-                country:country,
+                country: country,
                 interests: interests,
                 introduction: introduction,
                 image: image
@@ -206,7 +223,7 @@ async function main() {
                     gender: req.body.gender,
                     dob: req.body.dob,
                     age: req.body.age,
-                    country:req.body.country,
+                    country: req.body.country,
                     interests: req.body.interests,
                     introduction: req.body.introduction
                 }
@@ -224,43 +241,22 @@ async function main() {
         }
     })
 
-    // app.put('/editUsername', async (req, res) => {
-    //     try {
-    //         await db.collection('usernames').updateOne({
-    //             user_id: ObjectId(req.body.user_id)
-    //         }, {
-    //             $set: {
-    //                 username: req.body.username
-    //             }
-    //         })
-    //         res.status(200)
-    //         res.send('updated')
-    //     } catch (e) {
-    //         res.status(500)
-    //         res.send({
-    //             'message': 'Unable to update username'
-    //         })
-    //         console.log(e)
-
-    //     }
-    // })
-
     app.post('/conversations', async (req, res) => {
         let user_id = req.body.user_id
         let user_name = req.body.user_name
         let user2_id = req.body.user2_id
         let user2_name = req.body.user2_name
-        let message=req.body.message
-        let name=req.body.name
+        let message = req.body.message
+        let name = req.body.name
         let result = await db.collection('conversations').insertOne({
             user_id: ObjectId(user_id),
             user_name: user_name,
             user2_id: ObjectId(user2_id),
             user2_name: user2_name,
             messages: [{
-                _id:ObjectId(),
-                name:name,
-                message:message
+                _id: ObjectId(),
+                name: name,
+                message: message
             }]
         })
         res.status(200)
@@ -286,10 +282,10 @@ async function main() {
             }, {
                 $push: {
                     messages: {
-                        _id:ObjectId(),
-                        name:req.body.name,
-                        message:req.body.message
-                        
+                        _id: ObjectId(),
+                        name: req.body.name,
+                        message: req.body.message
+
                     }
                 }
             })
@@ -308,12 +304,12 @@ async function main() {
         try {
             await db.collection('conversations').updateOne({
                 // _id:ObjectId(req.body.conversationId),
-                'messages._id':ObjectId(req.body.messageId)
+                'messages._id': ObjectId(req.body.messageId)
             }, {
                 $set: {
-                    
-                        'messages.$.message':req.body.message
-                        
+
+                    'messages.$.message': req.body.message
+
                 }
             })
             res.status(200)
@@ -347,7 +343,7 @@ async function main() {
 
     })
 
-   
+
 
     app.delete('/deleteUsername/:user_id', async (req, res) => {
         await db.collection('usernames').deleteOne({
