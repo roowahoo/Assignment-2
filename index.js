@@ -344,7 +344,6 @@ async function main() {
     })
 
 
-
     app.delete('/deleteUsername/:user_id', async (req, res) => {
         await db.collection('usernames').deleteOne({
             user_id: ObjectId(req.params.user_id)
@@ -357,6 +356,6 @@ async function main() {
 }
 main()
 
-app.listen(3001, () => {
+app.listen(process.env.PORT, () => {
     console.log('Server has started')
 })
